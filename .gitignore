@@ -1,0 +1,8 @@
+# Jamais de secrets sur GitHub
+.env
+
+# Données des conteneurs
+etc-pihole/
+
+# Sauvegardes locales
+*.bak*

@@ -1,0 +1,12 @@
+services:
+  duckdns:
+    image: lscr.io/linuxserver/duckdns:latest
+    container_name: duckdns
+    environment:
+      - TZ=America/Toronto
+      # Ces deux valeurs sont définies dans Portainer (Environment variables),
+      # jamais écrites ici : le token est un secret.
+      - SUBDOMAINS=${SUBDOMAINS}
+      - TOKEN=${TOKEN}
+      - UPDATE_IP=ipv4
+    restart: unless-stopped

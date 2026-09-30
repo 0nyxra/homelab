@@ -1,0 +1,18 @@
+services:
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homepage
+    environment:
+      - HOMEPAGE_ALLOWED_HOSTS=home.MONDOMAINE.duckdns.org
+      # Mot de passe d'application Pi-hole, défini dans les variables de la stack Portainer
+      - HOMEPAGE_VAR_PIHOLE_KEY=${HOMEPAGE_VAR_PIHOLE_KEY}
+    volumes:
+      - /home/chahd/homelab/homepage/config:/app/config
+    networks:
+      - default
+      - proxy
+    restart: unless-stopped
+
+networks:
+  proxy:
+    external: true

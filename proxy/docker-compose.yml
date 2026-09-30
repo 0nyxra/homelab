@@ -1,0 +1,30 @@
+services:
+  npm:
+    image: jc21/nginx-proxy-manager:latest
+    container_name: nginx-proxy-manager
+    ports:
+      # Ports 80/443 : réseau local seulement. NE JAMAIS les rediriger sur le routeur.
+      - "80:80"
+      - "443:443"
+      # Interface d'administration : locale seulement, par tunnel SSH
+      # (ssh -L 8081:localhost:81 puis http://localhost:8081)
+      - "127.0.0.1:81:81"
+    volumes:
+      - npm_data:/data
+      - npm_letsencrypt:/etc/letsencrypt
+    networks:
+      - default
+      - proxy   # joint homepage, uptime-kuma, pihole, portainer par leur nom
+      - wg      # joint wg-easy:51821 sans toucher à la stack wg-easy
+    restart: unless-stopped
+
+volumes:
+  npm_data:
+  npm_letsencrypt:
+
+networks:
+  proxy:
+    external: true
+  wg:
+    external: true
+    name: wireguard_wg

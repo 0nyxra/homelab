@@ -1,0 +1,31 @@
+# href : adresse que je clique (domaine)
+# url / siteMonitor : adresse utilisée par Homepage à l'interne (nom du conteneur, réseau proxy)
+- 🌷 Réseau:
+    - Pi-hole:
+        icon: pi-hole.png
+        href: https://pihole.MONDOMAINE.duckdns.org/admin
+        description: DNS et blocage des pubs
+        # siteMonitor ne marche pas avec le serveur web de Pi-hole v6 (voir journal de bord)
+        ping: 192.168.40.46
+        widget:
+          type: pihole
+          url: http://pihole:80
+          version: 6
+          key: "{{HOMEPAGE_VAR_PIHOLE_KEY}}"
+    - WireGuard:
+        icon: wireguard.png
+        href: https://vpn.MONDOMAINE.duckdns.org
+        description: VPN (wg-easy)
+        siteMonitor: https://vpn.MONDOMAINE.duckdns.org
+
+- 🎀 Gestion:
+    - Portainer:
+        icon: portainer.png
+        href: https://portainer.MONDOMAINE.duckdns.org
+        description: Conteneurs Docker
+        siteMonitor: http://portainer:9000
+    - Uptime Kuma:
+        icon: uptime-kuma.png
+        href: https://kuma.MONDOMAINE.duckdns.org
+        description: Supervision et alertes
+        siteMonitor: http://uptime-kuma:3001

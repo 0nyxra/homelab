@@ -1,0 +1,43 @@
+services:
+  pihole:
+    container_name: pihole
+    image: pihole/pihole:latest
+    environment:
+      TZ: 'America/Toronto'
+      FTLCONF_webserver_api_password: '${PIHOLE_PASSWORD}'
+      FTLCONF_dns_listeningMode: 'ALL'
+      FTLCONF_dns_upstreams: '1.1.1.1;9.9.9.9'
+      FTLCONF_misc_dnsmasq_lines: 'address=/lab/192.168.40.46;address=/MONDOMAINE.duckdns.org/192.168.40.46'
+    volumes:
+      - './etc-pihole:/etc/pihole'
+    ports:
+      - '53:53/tcp'
+      - '53:53/udp'
+      # Interface web : via NPM (http://pihole:80), plus aucun port publié
+    networks:
+      - default
+      - proxy
+    restart: unless-stopped
+
+  portainer:
+    container_name: portainer
+    image: portainer/portainer-ce:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    ports:
+      # Accès de secours seulement, par tunnel SSH (ssh -L 9000:localhost:9000)
+      - '127.0.0.1:9000:9000'
+    networks:
+      - default
+      - proxy
+    restart: unless-stopped
+
+volumes:
+  portainer_data:
+    external: true
+
+networks:
+  # Réseau partagé avec NPM : créé une fois avec « docker network create proxy »
+  proxy:
+    external: true

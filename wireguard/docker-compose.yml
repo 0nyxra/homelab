@@ -1,0 +1,52 @@
+services:
+  wg-easy:
+    image: ghcr.io/wg-easy/wg-easy:15
+    container_name: wg-easy
+    environment:
+      # Interface web en HTTP : jointe seulement par NPM (réseau wireguard_wg),
+      # qui fait le HTTPS. Le port 51821 n'est plus publié.
+      - INSECURE=true
+    # Correctif : le noyau 6.18 du Pi n'a plus iptables legacy -> on force iptables-nft
+    command:
+      - /usr/bin/dumb-init
+      - sh
+      - -c
+      - |
+        for t in iptables ip6tables; do
+          ln -sf /usr/sbin/$$t-nft /etc/alternatives/$$t
+          ln -sf /usr/sbin/$$t-nft-restore /etc/alternatives/$$t-restore
+          ln -sf /usr/sbin/$$t-nft-save /etc/alternatives/$$t-save
+        done
+        exec node server/index.mjs
+    networks:
+      wg:
+        ipv4_address: 10.42.42.42
+        ipv6_address: fdcc:ad94:bacf:61a3::2a
+    volumes:
+      - etc_wireguard:/etc/wireguard
+      - /lib/modules:/lib/modules:ro
+    ports:
+      - "51820:51820/udp"   # seul port redirigé sur le routeur
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    sysctls:
+      - net.ipv4.ip_forward=1
+      - net.ipv4.conf.all.src_valid_mark=1
+      - net.ipv6.conf.all.disable_ipv6=0
+      - net.ipv6.conf.all.forwarding=1
+      - net.ipv6.conf.default.forwarding=1
+
+volumes:
+  etc_wireguard:
+
+networks:
+  wg:
+    driver: bridge
+    enable_ipv6: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.42.42.0/24
+        - subnet: fdcc:ad94:bacf:61a3::/64

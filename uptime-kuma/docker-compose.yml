@@ -1,0 +1,21 @@
+services:
+  uptime-kuma:
+    image: louislam/uptime-kuma:2
+    container_name: uptime-kuma
+    volumes:
+      - uptime-kuma:/app/data
+    networks:
+      - default
+      - proxy   # surveille les services par leur nom (http://portainer:9000, ...)
+      - wg      # surveille wg-easy:51821
+    restart: unless-stopped
+
+volumes:
+  uptime-kuma:
+
+networks:
+  proxy:
+    external: true
+  wg:
+    external: true
+    name: wireguard_wg

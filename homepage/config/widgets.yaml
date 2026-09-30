@@ -1,0 +1,27 @@
+- greeting:
+    text_size: xl
+    text: "Bienvenue dans le lab de Chahd 🌸"
+
+- search:
+    provider: google
+    target: _blank
+
+- openmeteo:
+    label: MAVILLE
+    latitude: 00.00    # remplacer par sa latitude
+    longitude: -00.00  # remplacer par sa longitude
+    timezone: America/Toronto
+    units: metric
+
+- resources:
+    cpu: true
+    memory: true
+    disk: /
+    cputemp: true
+    uptime: true
+
+- datetime:
+    text_size: md
+    format:
+      dateStyle: long
+      timeStyle: short

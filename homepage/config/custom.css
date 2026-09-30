@@ -1,0 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Pacifico&display=swap');
+
+/* Fond dégradé rose pastel, sur tous les éléments qui peuvent recouvrir la page */
+html, body, #__next, #page_wrapper, #inner_wrapper {
+  background: linear-gradient(135deg, #ffe4f0 0%, #fbcfe8 45%, #f5d0fe 100%) fixed !important;
+}
+body {
+  font-family: 'Quicksand', sans-serif !important;
+  color: #831843 !important;
+}
+
+/* Titres de sections en cursive */
+h2 {
+  font-family: 'Pacifico', cursive !important;
+  color: #db2777 !important;
+}
+
+/* Tuiles blanches, douces et arrondies */
+.service-card, .bookmark {
+  border-radius: 22px !important;
+  background: rgba(255, 255, 255, 0.75) !important;
+  box-shadow: 0 6px 20px rgba(236, 72, 153, 0.18) !important;
+  border: 1px solid rgba(244, 114, 182, 0.35) !important;
+}
+
+/* Texte des tuiles en rose foncé, lisible */
+.service-card *, .bookmark * {
+  color: #9d174d !important;
+}
+
+/* Petites cases de stats (Pi-hole) en rose très clair */
+.service-block {
+  background: #fdf2f8 !important;
+  border-radius: 14px !important;
+}
+
+/* Barre du haut (CPU, RAM...) en rose */
+#information-widgets, #information-widgets * {
+  color: #9d174d !important;
+}
