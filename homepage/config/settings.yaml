@@ -1,6 +1,31 @@
-title: Chahd's lab 🌸
-theme: light
+title: Lab de Chahd
+description: Homelab Raspberry Pi 5 · zéro port ouvert
+theme: dark
 color: pink
-cardBlur: md
-headerStyle: clean
+headerStyle: boxed
 statusStyle: dot
+hideVersion: true
+useEqualHeights: true
+target: _blank
+
+layout:
+  Réseau:
+    icon: mdi-lan
+    style: row
+    columns: 3
+  Supervision:
+    icon: mdi-heart-pulse
+    style: row
+    columns: 3
+  Gestion:
+    icon: mdi-server
+    style: row
+    columns: 3
+  Documentation:
+    icon: mdi-book-open-variant
+    style: row
+    columns: 3
+  Consoles:
+    icon: mdi-console
+    style: row
+    columns: 3

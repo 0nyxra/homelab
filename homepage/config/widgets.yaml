@@ -1,10 +1,18 @@
 - greeting:
     text_size: xl
-    text: "Bienvenue dans le lab de Chahd 🌸"
+    text: "Lab de Chahd"
 
-- search:
-    provider: google
-    target: _blank
+- resources:
+    label: Raspberry Pi 5
+    cpu: true
+    memory: true
+    disk: /
+    cputemp: true
+    tempmin: 30
+    tempmax: 85
+    units: metric
+    uptime: true
+    expanded: true
 
 - openmeteo:
     label: MAVILLE
@@ -13,15 +21,10 @@
     timezone: America/Toronto
     units: metric
 
-- resources:
-    cpu: true
-    memory: true
-    disk: /
-    cputemp: true
-    uptime: true
-
 - datetime:
     text_size: md
+    locale: fr
     format:
       dateStyle: long
       timeStyle: short
+      hour12: false

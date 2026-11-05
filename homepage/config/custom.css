@@ -1,40 +1,66 @@
-@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Pacifico&display=swap');
+/* Lab de Chahd : fond sombre, accents rose. Une seule police, des tuiles sobres. */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap');
 
-/* Fond dégradé rose pastel, sur tous les éléments qui peuvent recouvrir la page */
+:root {
+  --fond: #120d14;
+  --fond-2: #1b1420;
+  --tuile: rgba(255, 255, 255, 0.035);
+  --tuile-survol: rgba(244, 114, 182, 0.08);
+  --bordure: rgba(244, 114, 182, 0.14);
+  --rose: #f472b6;
+  --rose-doux: #f9a8d4;
+  --texte: #f3e8ee;
+  --texte-2: #b9a6b3;
+}
+
 html, body, #__next, #page_wrapper, #inner_wrapper {
-  background: linear-gradient(135deg, #ffe4f0 0%, #fbcfe8 45%, #f5d0fe 100%) fixed !important;
+  background: radial-gradient(1200px 600px at 10% -10%, #2a1626 0%, transparent 60%),
+              linear-gradient(180deg, var(--fond-2) 0%, var(--fond) 100%) fixed !important;
 }
+
 body {
-  font-family: 'Quicksand', sans-serif !important;
-  color: #831843 !important;
+  font-family: 'Inter', system-ui, sans-serif !important;
+  color: var(--texte) !important;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Titres de sections en cursive */
+/* Titres de groupes : petites capitales roses, espacées */
 h2 {
-  font-family: 'Pacifico', cursive !important;
-  color: #db2777 !important;
+  font-family: 'Inter', sans-serif !important;
+  font-size: 0.78rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase !important;
+  color: var(--rose) !important;
 }
 
-/* Tuiles blanches, douces et arrondies */
+/* Tuiles : discrètes, une bordure fine, un survol rose */
 .service-card, .bookmark {
-  border-radius: 22px !important;
-  background: rgba(255, 255, 255, 0.75) !important;
-  box-shadow: 0 6px 20px rgba(236, 72, 153, 0.18) !important;
-  border: 1px solid rgba(244, 114, 182, 0.35) !important;
+  background: var(--tuile) !important;
+  border: 1px solid var(--bordure) !important;
+  border-radius: 12px !important;
+  box-shadow: none !important;
+  transition: background 0.15s ease, border-color 0.15s ease !important;
+}
+.service-card:hover, .bookmark:hover {
+  background: var(--tuile-survol) !important;
+  border-color: rgba(244, 114, 182, 0.4) !important;
 }
 
-/* Texte des tuiles en rose foncé, lisible */
-.service-card *, .bookmark * {
-  color: #9d174d !important;
-}
+/* Nom du service en clair, description en gris rosé */
+.service-name, .bookmark-name { color: var(--texte) !important; font-weight: 500 !important; }
+.service-description, .bookmark-description { color: var(--texte-2) !important; }
 
-/* Petites cases de stats (Pi-hole) en rose très clair */
+/* Cases de stats des widgets : chiffres en police mono */
 .service-block {
-  background: #fdf2f8 !important;
-  border-radius: 14px !important;
+  background: rgba(244, 114, 182, 0.06) !important;
+  border-radius: 8px !important;
+}
+.service-block div:first-child {
+  font-family: 'JetBrains Mono', monospace !important;
+  color: var(--rose-doux) !important;
 }
 
-/* Barre du haut (CPU, RAM...) en rose */
-#information-widgets, #information-widgets * {
-  color: #9d174d !important;
-}
+/* Barre du haut (CPU, RAM, température...) */
+#information-widgets { border-bottom: 1px solid var(--bordure) !important; }
+#information-widgets, #information-widgets * { color: var(--texte-2) !important; }

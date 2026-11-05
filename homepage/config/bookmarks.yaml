@@ -1,0 +1,29 @@
+# Remplace les favoris par défaut (GitHub, Reddit, YouTube)
+
+- Documentation:
+    - Dépôt homelab:
+        - icon: github.svg
+          href: https://github.com/0nyxra/homelab
+          description: Code, configs et journal de bord
+    - Durcissement:
+        - icon: mdi-shield-lock
+          href: https://github.com/0nyxra/homelab/blob/main/docs/durcissement.md
+          description: SSH, UFW, Fail2ban, rkhunter, Lynis
+    - Tailscale:
+        - icon: mdi-vpn
+          href: https://github.com/0nyxra/homelab/blob/main/docs/tailscale.md
+          description: Zéro port ouvert, exit node, ACL
+
+- Consoles:
+    - Tailscale admin:
+        - icon: si-tailscale
+          href: https://login.tailscale.com/admin/acls
+          description: ACL et appareils
+    - DuckDNS:
+        - icon: mdi-duck
+          href: https://www.duckdns.org/
+          description: Domaine et token
+    - Routeur Cogeco:
+        - icon: mdi-router-wireless
+          href: http://192.168.40.1
+          description: Redirections de ports (aucune)

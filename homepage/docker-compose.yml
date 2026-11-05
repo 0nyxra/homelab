@@ -4,8 +4,13 @@ services:
     container_name: homepage
     environment:
       - HOMEPAGE_ALLOWED_HOSTS=home.MONDOMAINE.duckdns.org
-      # Mot de passe d'application Pi-hole, défini dans les variables de la stack Portainer
-      - HOMEPAGE_VAR_PIHOLE_KEY=${HOMEPAGE_VAR_PIHOLE_KEY}
+      # Clés des widgets, définies dans les variables de la stack Portainer (jamais dans ce fichier)
+      - HOMEPAGE_VAR_PIHOLE_KEY=${HOMEPAGE_VAR_PIHOLE_KEY}        # mot de passe d'application Pi-hole
+      - HOMEPAGE_VAR_PORTAINER_KEY=${HOMEPAGE_VAR_PORTAINER_KEY}  # Access token Portainer
+      - HOMEPAGE_VAR_HC_KEY=${HOMEPAGE_VAR_HC_KEY}                # clé API healthchecks.io (lecture seule)
+      - HOMEPAGE_VAR_HC_UUID=${HOMEPAGE_VAR_HC_UUID}              # UUID du check (privé)
+      - HOMEPAGE_VAR_TS_KEY=${HOMEPAGE_VAR_TS_KEY}                # clé API Tailscale (expire après 90 jours max)
+      - HOMEPAGE_VAR_TS_DEVICE=${HOMEPAGE_VAR_TS_DEVICE}          # ID du Pi dans Tailscale
     volumes:
       - /home/chahd/homelab/homepage/config:/app/config
     networks:

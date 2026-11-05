@@ -306,10 +306,11 @@ Leçon : une IP n'identifie une machine que dans un réseau donné. Toujours vé
 - [x] Tailscale (route de sous-réseau, split DNS) et **zéro port ouvert**
 - [x] Alerte externe (healthchecks.io)
 - [x] Exit node + ACL au moindre privilège
-- [x]  Test Tailscale depuis le Wi-Fi du cégep
+- [ ] Test Tailscale depuis le Wi-Fi du cégep
 - [ ] iTop (billetterie / gestion de services)
 - [ ] Grafana + Prometheus
 - [ ] Sauvegarde automatique des configs et des volumes
+- [ ] Pi en Ethernet
 
 
 ---
