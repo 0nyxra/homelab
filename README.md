@@ -8,17 +8,17 @@ Le but : apprendre en construisant quelque chose d'utile, en documentant chaque 
 
 ## Services
 
-| | Service | À quoi ça sert |
-|---|---|---|
-| 🕳️ | **Pi-hole** | DNS local + blocage des pubs sur tout le réseau |
-| 🛰️ | **Tailscale** | VPN maillé : accès au lab de n'importe où, sans port ouvert (route de sous-réseau, split DNS, exit node, ACL) |
-| 🔐 | **WireGuard** (wg-easy) | Ancien VPN auto-hébergé, arrêté et plus exposé depuis le passage à Tailscale |
-| 🦆 | **DuckDNS** | Nom de domaine et défi DNS pour les certificats HTTPS |
-| 🔀 | **Nginx Proxy Manager** | Reverse proxy + certificats HTTPS (Let's Encrypt) |
-| 📊 | **Uptime Kuma** | Surveille tous les services et m'alerte par courriel |
-| 💓 | **healthchecks.io** | Alerte externe si la maison, le Pi ou Pi-hole tombe (Kuma ne peut pas le faire lui-même) |
-| 🏠 | **Homepage** | Page d'accueil du lab, avec l'état de chaque service |
-| 🖥️ | **Portainer** | Gestion des conteneurs Docker |
+| Service | À quoi ça sert |
+|---|---|
+| **Pi-hole** | DNS local + blocage des pubs sur tout le réseau |
+| **Tailscale** | VPN maillé : accès au lab de n'importe où, sans port ouvert (route de sous-réseau, split DNS, exit node, ACL) |
+| **WireGuard** (wg-easy) | Ancien VPN auto-hébergé, arrêté et plus exposé depuis le passage à Tailscale |
+| **DuckDNS** | Nom de domaine et défi DNS pour les certificats HTTPS |
+| **Nginx Proxy Manager** | Reverse proxy + certificats HTTPS (Let's Encrypt) |
+| **Uptime Kuma** | Surveille tous les services et m'alerte par courriel |
+| **healthchecks.io** | Alerte externe si la maison, le Pi ou Pi-hole tombe (Kuma ne peut pas le faire lui-même) |
+| **Homepage** | Page d'accueil du lab, avec l'état de chaque service |
+| **Portainer** | Gestion des conteneurs Docker |
 
 ## Architecture
 
@@ -68,7 +68,7 @@ homelab/
 ├── duckdns/                  # mise à jour du DNS dynamique
 ├── proxy/                    # Nginx Proxy Manager
 ├── uptime-kuma/              # supervision
-├── homepage/                 # page d'accueil + config (thème rose 🌸)
+├── homepage/                 # page d'accueil + config 
 ├── configs/systeme/          # SSH, UFW, Fail2ban, rkhunter
 ├── docs/
 │   ├── durcissement.md       # durcissement complet du Pi, pas à pas
