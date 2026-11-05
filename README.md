@@ -2,7 +2,8 @@
 
 ![Page d'accueil de mon lab](docs/homepage.png)
 
-Mon lab perso sur un **Raspberry Pi 5** : DNS, VPN, reverse proxy avec HTTPS, supervision et une page d'accueil rose (évidemment).
+Mon lab perso sur un **Raspberry Pi 5** : DNS, VPN maillé, reverse proxy avec HTTPS, supervision et une page d'accueil rose (évidemment).
+**Aucun port ouvert sur Internet** : tout l'accès à distance passe par Tailscale.
 Le but : apprendre en construisant quelque chose d'utile, en documentant chaque problème rencontré et comment je l'ai réglé.
 
 ## Services
@@ -10,46 +11,52 @@ Le but : apprendre en construisant quelque chose d'utile, en documentant chaque 
 | | Service | À quoi ça sert |
 |---|---|---|
 | 🕳️ | **Pi-hole** | DNS local + blocage des pubs sur tout le réseau |
-| 🔐 | **WireGuard** (wg-easy) | VPN pour accéder au lab de n'importe où |
-| 🦆 | **DuckDNS** | Nom de domaine qui suit mon IP publique si elle change |
+| 🛰️ | **Tailscale** | VPN maillé : accès au lab de n'importe où, sans port ouvert (route de sous-réseau, split DNS, exit node, ACL) |
+| 🔐 | **WireGuard** (wg-easy) | Ancien VPN auto-hébergé, arrêté et plus exposé depuis le passage à Tailscale |
+| 🦆 | **DuckDNS** | Nom de domaine et défi DNS pour les certificats HTTPS |
 | 🔀 | **Nginx Proxy Manager** | Reverse proxy + certificats HTTPS (Let's Encrypt) |
 | 📊 | **Uptime Kuma** | Surveille tous les services et m'alerte par courriel |
+| 💓 | **healthchecks.io** | Alerte externe si la maison, le Pi ou Pi-hole tombe (Kuma ne peut pas le faire lui-même) |
 | 🏠 | **Homepage** | Page d'accueil du lab, avec l'état de chaque service |
 | 🖥️ | **Portainer** | Gestion des conteneurs Docker |
 
 ## Architecture
 
 ```
-  📱 Téléphone (dehors)
-        │  tunnel WireGuard (UDP 51820)
+  💻 Laptop · 📱 iPhone (cégep, 5G, Wi-Fi public)
+        │  Tailscale : connexion directe (NAT traversal)
+        │  ou relais DERP en HTTPS si l'UDP est bloqué
         ▼
      Internet
         │
-  [ Routeur ] ── seul port ouvert : UDP 51820 ──┐
-        │                                       │
-  ┌─────┴────────────────────────────────────┐  │
-  │  Raspberry Pi 5 (192.168.40.46)          │◄─┘
+  [ Routeur ] ── aucun port redirigé ──
+        │
+  ┌─────┴────────────────────────────────────┐
+  │  Raspberry Pi 5 (192.168.40.46)          │
   │  UFW + Fail2ban                          │
   │                                          │
-  │  Ports publiés : 53 · 80 · 443 · 51820   │
+  │  Tailscale (hôte, 100.83.x) .. VPN       │
+  │     ├─ route vers 192.168.40.0/24        │
+  │     ├─ split DNS → Pi-hole               │
+  │     └─ exit node (sur demande)           │
   │                                          │
-  │  wg-easy ............ VPN                │
+  │  Ports publiés (LAN) : 53 · 80 · 443     │
+  │                                          │
   │  Pi-hole ............ DNS (:53)          │
   │  Nginx Proxy Manager  HTTPS (:443)       │
   │     │  réseau Docker « proxy »           │
   │     ├─ home.*      → homepage:3000       │
   │     ├─ pihole.*    → pihole:80           │
   │     ├─ kuma.*      → uptime-kuma:3001    │
-  │     ├─ portainer.* → portainer:9000      │
-  │     └─ vpn.*       → wg-easy:51821       │
-  │        (réseau « wireguard_wg »)         │
-  │  DuckDNS ............ met à jour l'IP    │
+  │     └─ portainer.* → portainer:9000      │
+  │  DuckDNS ............ défi DNS (certs)   │
+  │  cron → healthchecks.io (chaque minute)  │
   └──────────────────────────────────────────┘
         │
   Mes appareils à la maison
 ```
 
-Chaque service a son nom en HTTPS (`https://pihole.MONDOMAINE.duckdns.org`). Pi-hole répond l'IP **locale** du Pi pour ces noms, donc le trafic reste à la maison. NPM joint chaque service par son **nom de conteneur** : aucune interface web n'a de port publié.
+Chaque service a son nom en HTTPS (`https://pihole.MONDOMAINE.duckdns.org`). Pi-hole répond l'IP **locale** du Pi pour ces noms : à la maison, le trafic reste sur le LAN ; dehors, le split DNS de Tailscale envoie ces noms à Pi-hole et la route de sous-réseau amène le trafic jusqu'au Pi. NPM joint chaque service par son **nom de conteneur** : aucune interface web n'a de port publié.
 
 ## Structure du dépôt
 
@@ -57,7 +64,7 @@ Chaque service a son nom en HTTPS (`https://pihole.MONDOMAINE.duckdns.org`). Pi-
 homelab/
 ├── docker-compose.yml        # Pi-hole + Portainer
 ├── .env.example              # modèle pour les mots de passe
-├── wireguard/                # wg-easy (+ correctif nftables)
+├── wireguard/                # wg-easy (+ correctif nftables), arrêté
 ├── duckdns/                  # mise à jour du DNS dynamique
 ├── proxy/                    # Nginx Proxy Manager
 ├── uptime-kuma/              # supervision
@@ -65,14 +72,15 @@ homelab/
 ├── configs/systeme/          # SSH, UFW, Fail2ban, rkhunter
 ├── docs/
 │   ├── durcissement.md       # durcissement complet du Pi, pas à pas
+│   ├── tailscale.md          # diagnostic WireGuard, Tailscale, zéro port ouvert
 │   └── homepage.png
-└── images/                   # captures avant / après du durcissement
+└── images/                   # captures avant / après
 ```
 
 ## Installation
 
 ```bash
-git clone https://github.com/Chahdmk/homelab.git
+git clone https://github.com/0nyxra/homelab.git
 cd homelab
 cp .env.example .env          # mettre ses propres mots de passe
 docker volume create portainer_data
@@ -80,24 +88,31 @@ docker network create proxy   # réseau partagé entre NPM et les services
 docker compose up -d          # Pi-hole + Portainer
 ```
 
-Les autres services se déploient comme **stacks dans Portainer**, à partir du `docker-compose.yml` de chaque dossier (déployer wg-easy **avant** NPM et Uptime Kuma, qui rejoignent son réseau `wireguard_wg`). Les secrets (token DuckDNS, clé API Pi-hole, mot de passe de base de données) se définissent dans les **variables d'environnement de la stack** : ils ne sont jamais écrits dans les fichiers.
+Les autres services se déploient comme **stacks dans Portainer**, à partir du `docker-compose.yml` de chaque dossier (déployer wg-easy **avant** NPM et Uptime Kuma, qui rejoignent son réseau `wireguard_wg` ; la stack peut ensuite rester arrêtée). Les secrets (token DuckDNS, clé API Pi-hole, mot de passe de base de données) se définissent dans les **variables d'environnement de la stack** : ils ne sont jamais écrits dans les fichiers.
+
+Tailscale s'installe directement sur le Pi (pas en conteneur) : voir **[docs/tailscale.md](docs/tailscale.md)**.
 
 Remplacer `MONDOMAINE` par son sous-domaine DuckDNS, `192.168.40.46` par l'IP de son Pi, et `MAVILLE` / les coordonnées dans `homepage/config/widgets.yaml`.
 
 ## 🔒 Sécurité
 
-- **Un seul port ouvert sur Internet : UDP 51820** (WireGuard). Tout le reste n'est accessible qu'à la maison ou via le VPN.
+- **Aucun port ouvert sur Internet.** L'ancienne redirection UDP 51820 (WireGuard) est supprimée : tout l'accès à distance passe par Tailscale. Preuve par `tcpdump` : 156 paquets avant, 0 après.
+- **ACL Tailscale au moindre privilège** : SSH seulement depuis le laptop, l'iPhone n'a que le DNS et le HTTPS, et le Pi ne peut ouvrir aucune connexion vers mes appareils.
 - **Aucun secret dans le dépôt** : `.env` est dans le `.gitignore`, et les stacks utilisent des variables `${...}`.
 - **Vrais certificats HTTPS** sans ouvrir les ports 80/443 : défi DNS Let's Encrypt via DuckDNS.
 - **SSH par clé seulement**, root interdit.
-- **Pare-feu UFW** (refus par défaut, SSH limité au LAN et au VPN) + **Fail2ban** sur SSH.
+- **Pare-feu UFW** (refus par défaut, SSH limité au LAN et à Tailscale) + **Fail2ban** sur SSH.
 - **Mises à jour de sécurité automatiques** (unattended-upgrades).
-- **Seulement 4 ports publiés sur le Pi** (53, 80, 443, 51820) au lieu de 12 : les services passent par le réseau Docker `proxy`.
+- **Seulement 3 ports publiés sur le Pi** (53, 80, 443, pour le LAN) au lieu de 12 : les services passent par le réseau Docker `proxy`.
 - **Admin Portainer et NPM** liées à `127.0.0.1`, accessibles seulement par tunnel SSH.
 - **rkhunter** : 0 rootkit. **Lynis : hardening index 67.**
+- **Alerte externe** (healthchecks.io) : un ping par minute, seulement si Pi-hole répond. Si la maison tombe, je reçois quand même un courriel.
+- **Exit node testé sans fuite IPv6** : sur un Wi-Fi public, tout mon trafic peut ressortir par la maison.
 - Mots de passe d'application (Gmail, Pi-hole) au lieu des vrais mots de passe, tous rangés dans un gestionnaire.
 
-➡️ Tout le détail, avec les commandes et les captures avant / après : **[docs/durcissement.md](docs/durcissement.md)**
+➡️ Tout le détail, avec les commandes et les captures avant / après :
+- **[docs/durcissement.md](docs/durcissement.md)** : SSH, UFW, Fail2ban, ports Docker, rkhunter, Lynis
+- **[docs/tailscale.md](docs/tailscale.md)** : diagnostic WireGuard, Tailscale, fermeture du dernier port, exit node, ACL
 
 ![Ports fermés : avant / après](images/09-test-ports-avant-apres.png)
 
@@ -228,13 +243,55 @@ Pièges rencontrés en chemin :
 Détails et captures : [docs/durcissement.md](docs/durcissement.md)
 </details>
 
+<details>
+<summary><b>WireGuard ne marchait pas en 5G… mais le serveur allait bien</b></summary>
+
+Au cégep, mon cell envoyait des paquets WireGuard vers la maison sans jamais recevoir de réponse. Le soir, `tcpdump -ni wlan0 udp port 51820` sur le Pi :
+- 1er essai : tout marchait… parce que le cell était encore sur le Wi-Fi de la maison (*hairpin NAT*, l'adresse source était ma propre IP publique) ;
+- 2e essai en LTE : ✅ tunnel établi et vrai transfert de données ;
+- en 5G : ❌. Mon fournisseur y passe par un réseau IPv6 seulement avec **NAT64**, et l'UDP de WireGuard ne revient pas.
+
+Leçon : un test « ça marche » ne vaut que si on sait **par où** passe le trafic.
+</details>
+
+<details>
+<summary><b>Tailscale : « ça marche sur mon ordi » n'est pas un test</b></summary>
+
+- Mon premier test « extérieur » était sur le Wi-Fi de la maison : `netcheck` affichait `self=192.168.40.30`.
+- `ping 100.83.88.59` marchait, mais pas `ping 192.168.40.46` : la route de sous-réseau était **annoncée** mais pas **approuvée** dans la console.
+- Le split DNS n'avait jamais été ajouté : le DNS du partage de connexion répondait mon IP publique.
+- `nslookup` répondait encore la mauvaise IP après la correction : sur Windows, il **ignore la NRPT** où Tailscale range son split DNS. ✅ `Resolve-DnsName` et `Get-DnsClientNrptRule`.
+- Sur iPhone, un seul VPN à la fois : WireGuard actif bloquait Tailscale.
+
+Détails : [docs/tailscale.md](docs/tailscale.md)
+</details>
+
+<details>
+<summary><b>Fermer le dernier port sans me couper l'accès</b></summary>
+
+- La règle UFW `tailscale0` **n'existait pas**. Le ping, Kuma (Docker contourne UFW) et le DNS marchaient quand même, ce qui masquait le problème : fermer WireGuard m'aurait coupé le SSH à distance. ✅ Ajoutée, puis SSH testé par Tailscale **avant** de fermer quoi que ce soit.
+- Après l'ajout, la règle n° 7 n'était plus WireGuard mais Tailscale : un `ufw delete 7` l'aurait supprimée. ✅ `ufw delete allow 51820/udp`, par contenu.
+- La règle UFW 51820 n'avait jamais vraiment protégé le port (encore Docker) : ce qui ferme la porte, c'est la redirection du routeur.
+- `nmap -sU` répond `open|filtered` avant **et** après : WireGuard ne répond jamais aux inconnus. La vraie preuve, c'est `tcpdump`.
+</details>
+
+<details>
+<summary><b>Un port FTP « ouvert » sur mon laptop… qui n'était pas mon laptop</b></summary>
+
+Un scan de l'IP Tailscale de mon laptop montrait `21/tcp open`, mais `netstat` ne voyait aucun service. `Test-NetConnection` a donné la réponse : Tailscale coupé, la connexion sortait par le **Wi-Fi** vers le réseau du fournisseur.
+
+Tailscale et les fournisseurs cellulaires utilisent la **même plage 100.64.0.0/10 (CGNAT)**. Sans Tailscale, l'adresse ne m'appartenait plus et je scannais un équipement du fournisseur. Avec Tailscale actif : port fermé.
+
+Leçon : une IP n'identifie une machine que dans un réseau donné. Toujours vérifier l'interface utilisée.
+</details>
+
 ## Ce que ce projet m'a appris
 
-**Réseau** : DNS, NAT et redirection de ports, VPN WireGuard, DNS dynamique, réseaux Docker, diagnostic couche par couche (`ping`, `nslookup`, `tracert`, `Test-NetConnection`)
-**Sécurité** : surface d'attaque minimale, durcissement Linux (SSH, UFW, Fail2ban, rkhunter, Lynis), gestion des secrets, certificats TLS et défi DNS, mots de passe d'application
+**Réseau** : DNS, NAT et redirection de ports, VPN WireGuard et Tailscale (route de sous-réseau, split DNS, exit node, NAT traversal, relais DERP), NAT64 et CGNAT, DNS dynamique, réseaux Docker, diagnostic couche par couche (`ping`, `nslookup`, `Resolve-DnsName`, `tracert`, `tcpdump`, `nmap`, `Test-NetConnection`)
+**Sécurité** : surface d'attaque minimale (zéro port ouvert), moindre privilège (ACL), tests négatifs et de fuite IPv6, durcissement Linux (SSH, UFW, Fail2ban, rkhunter, Lynis), gestion des secrets, certificats TLS et défi DNS, mots de passe d'application
 **Linux et Docker** : Docker Compose, volumes et *bind mounts*, variables d'environnement, lecture de logs, iptables et nftables
-**Supervision** : sondes HTTP et DNS, alertes SMTP
-**Méthode** : lire les logs jusqu'à la vraie cause, garder un accès de secours avant de toucher au pare-feu, tout documenter
+**Supervision** : sondes HTTP et DNS, alertes SMTP, *dead man's switch* externe
+**Méthode** : lire les logs jusqu'à la vraie cause, garder un accès de secours avant de toucher au pare-feu, vérifier un résultat par une deuxième méthode, tout documenter
 
 ## Prochaines étapes
 
@@ -246,10 +303,13 @@ Détails et captures : [docs/durcissement.md](docs/durcissement.md)
 - [x] Page d'accueil avec widgets (Homepage)
 - [x] Reverse proxy + vrai HTTPS
 - [x] Durcissement du Pi (SSH, UFW, Fail2ban, ports Docker, rkhunter, Lynis)
+- [x] Tailscale (route de sous-réseau, split DNS) et **zéro port ouvert**
+- [x] Alerte externe (healthchecks.io)
+- [x] Exit node + ACL au moindre privilège
+- [x]  Test Tailscale depuis le Wi-Fi du cégep
 - [ ] iTop (billetterie / gestion de services)
 - [ ] Grafana + Prometheus
 - [ ] Sauvegarde automatique des configs et des volumes
-- [ ] Pi en Ethernet
 
 
 ---
