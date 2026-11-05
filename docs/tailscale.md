@@ -361,10 +361,15 @@ tailscale set --exit-node=chahd --exit-node-allow-lan-access=true
 - ✅ Exit node sans fuite IPv6.
 - ✅ ACL au moindre privilège.
 
+## Test 4 — Wi-Fi du cégep (réseau restrictif) : 
+- UDP bloqué, donc aucune connexion directe possible.
+- Tailscale bascule automatiquement sur le relais DERP Toronto (TCP 443), avec une latence de 26 à 41 ms.
+- Le DNS résout kuma.chahd-lab.duckdns.org vers 192.168.40.46 et le tableau de bord Uptime Kuma est accessible.
+Le lab reste joignable même derrière un pare-feu qui bloque l’UDP.
+
 ## 11. Prochaines étapes
 
-- [ ] **Test 4** : Wi-Fi du cégep (`tailscale netcheck` → si `UDP: false` et que Kuma charge quand même, preuve que DERP traverse le pare-feu).
-- [ ] Tester l'alerte healthchecks.io (commenter la ligne cron, attendre le courriel « DOWN », puis « UP »).
-- [ ] Retirer les règles UFW SSH `10.8.0.0/24` et `10.42.42.0/24` si wg-easy est supprimé définitivement.
-- [ ] Décider pour Pi-hole en DNS global (blocage de pubs partout vs perte de DNS si le Pi tombe).
-- [ ] Passer le Pi en **Ethernet** (et régler l'avertissement UDP GRO).
+- [X] Tester l'alerte healthchecks.io (commenter la ligne cron, attendre le courriel « DOWN », puis « UP »).
+- [X] Retirer les règles UFW SSH `10.8.0.0/24` et `10.42.42.0/24` si wg-easy est supprimé définitivement.
+- [X] Décider pour Pi-hole en DNS global (blocage de pubs partout vs perte de DNS si le Pi tombe).
+- [X] Passer le Pi en **Ethernet** (et régler l'avertissement UDP GRO).
