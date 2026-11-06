@@ -1,0 +1,38 @@
+# Vérifications automatiques à chaque push et pull request
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:        # bouton « Run workflow » dans l'onglet Actions
+
+permissions:
+  contents: read
+
+jobs:
+  gitleaks:
+    name: Aucun secret publié (gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0    # tout l'historique, pas seulement le dernier commit
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  yamllint:
+    name: YAML valide (compose et Homepage)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install yamllint
+      - run: yamllint --strict .    # règles dans .yamllint.yml
+
+  shellcheck:
+    name: Script UFW (shellcheck)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: shellcheck configs/systeme/ufw-regles.sh

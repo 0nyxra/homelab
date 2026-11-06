@@ -1,0 +1,11 @@
+# Règles yamllint pour les fichiers compose et Homepage
+extends: default
+
+rules:
+  document-start: disable      # le "---" en tête n'est pas utile ici
+  line-length:
+    max: 120                   # les labels Homepage sont longs
+  truthy:
+    check-keys: false          # évite les faux positifs sur les clés
+  comments:
+    min-spaces-from-content: 1
