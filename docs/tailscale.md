@@ -275,6 +275,7 @@ Ensuite : redirection 51820/udp supprimée dans l'appli Cogeco, stack wg-easy **
 |---|---|
 | Avant | 156 paquets, dans les deux sens (handshake + données) |
 | Après | **0 paquet** |
+![tcpdump après la fermeture : 0 paquet sur 51820](../images/tailscale/01-tcpdump-apres.png)
 
 > 💡 **Limite de nmap en UDP :** un scan `-sU` de 51820 répond `open|filtered` avant **et** après, car WireGuard ne répond jamais aux inconnus. La vraie preuve est la capture tcpdump.
 
