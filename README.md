@@ -9,7 +9,6 @@
 ![Page d'accueil de mon lab](docs/homepage.png)
 
 Mon lab perso sur un **Raspberry Pi 5** : DNS, VPN maillé, reverse proxy avec HTTPS, supervision, et un tableau de bord Homepage qui affiche l'état de chaque service et donne accès à tous les outils en un clic.
-**Aucun port ouvert sur Internet** : tout l'accès à distance passe par Tailscale.
 Le but : apprendre en construisant quelque chose d'utile, en documentant chaque problème rencontré et comment je l'ai réglé.
 
 ## Services
