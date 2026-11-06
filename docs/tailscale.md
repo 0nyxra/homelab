@@ -167,7 +167,7 @@ Tous les tests « extérieurs » sont faits **sans le Wi-Fi de la maison** et **
 | 1 | Laptop → ping, DNS, Kuma | Partage de connexion du cell | ✅ (après correction de la route et du split DNS) |
 | 2 | iPhone → Kuma | 5G | ✅ avec Tailscale, ❌ avec WireGuard |
 | 3 | Laptop, **Tailscale coupé** | Partage de connexion du cell | ✅ échoue comme prévu |
-| 4 | Laptop → Kuma | Wi-Fi du cégep | ⏳ à faire |
+| 4 | Laptop → Kuma | Wi-Fi du cégep (UDP bloqué) | ✅ via le relais DERP (TCP 443) |
 
 ### Test 1 : laptop sur le partage de connexion
 
@@ -193,6 +193,15 @@ Resolve-DnsName kuma.chahd-lab.duckdns.org
 ✅ Sans tunnel, les services sont injoignables.
 
 ---
+
+### Test 4 : Wi-Fi du cégep (réseau restrictif)
+
+- UDP bloqué, donc aucune connexion directe possible.
+- Tailscale bascule automatiquement sur le relais DERP Toronto (TCP 443), avec une latence de 26 à 41 ms.
+- Le DNS résout `kuma.chahd-lab.duckdns.org` vers `192.168.40.46` et le tableau de bord Uptime Kuma est accessible.
+
+✅ Le lab reste joignable même derrière un pare-feu qui bloque l'UDP.
+
 
 ## 8. Pièges rencontrés 🪤
 
@@ -361,11 +370,6 @@ tailscale set --exit-node=chahd --exit-node-allow-lan-access=true
 - ✅ Exit node sans fuite IPv6.
 - ✅ ACL au moindre privilège.
 
-## Test 4 — Wi-Fi du cégep (réseau restrictif) : 
-- UDP bloqué, donc aucune connexion directe possible.
-- Tailscale bascule automatiquement sur le relais DERP Toronto (TCP 443), avec une latence de 26 à 41 ms.
-- Le DNS résout kuma.chahd-lab.duckdns.org vers 192.168.40.46 et le tableau de bord Uptime Kuma est accessible.
-Le lab reste joignable même derrière un pare-feu qui bloque l’UDP.
 
 ## 11. Prochaines étapes
 
