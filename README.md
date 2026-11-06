@@ -1,8 +1,14 @@
 # 🌸 homelab
 
+> **En bref**
+> - **Quoi** : un lab perso sur Raspberry Pi 5, avec une dizaine de services auto-hébergés en Docker (DNS, VPN, reverse proxy HTTPS, supervision).
+> - **Sécurité** : aucun port ouvert sur Internet, accès à distance par Tailscale avec des ACL au moindre privilège, Pi durci (SSH par clé, UFW, Fail2ban, Lynis 67).
+> - **Preuves** : chaque mesure est vérifiée et documentée avec les commandes et des captures avant / après (`tcpdump`, `nmap`, `sshd -T`).
+> - **Méthode** : un journal de bord de 14 vrais problèmes, de la cause jusqu'à la solution.
+
 ![Page d'accueil de mon lab](docs/homepage.png)
 
-Mon lab perso sur un **Raspberry Pi 5** : DNS, VPN maillé, reverse proxy avec HTTPS, supervision et une page d'accueil rose (évidemment).
+Mon lab perso sur un **Raspberry Pi 5** : DNS, VPN maillé, reverse proxy avec HTTPS, supervision, et un tableau de bord Homepage qui affiche l'état de chaque service et donne accès à tous les outils en un clic.
 **Aucun port ouvert sur Internet** : tout l'accès à distance passe par Tailscale.
 Le but : apprendre en construisant quelque chose d'utile, en documentant chaque problème rencontré et comment je l'ai réglé.
 
