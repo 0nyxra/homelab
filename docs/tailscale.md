@@ -325,6 +325,12 @@ tailscale set --exit-node=chahd --exit-node-allow-lan-access=true
 | `curl.exe -6 ifconfig.me` après | `could not connect` → **pas de fuite IPv6** (la maison n'a pas d'IPv6) |
 | `tracert -d 1.1.1.1` | 1er saut `100.83.88.59` (le Pi), puis `192.168.40.1` (routeur maison), puis Cogeco |
 
+
+![curl ifconfig.me avant / après l'exit node](../images/tailscale/02-curl-exit-node.png)
+
+![tracert : 1er saut par le Pi, puis le routeur de la maison](../images/tailscale/03-tracert-exit-node.png)
+
+
 > 💡 `tailscale status` affichait `direct <IP_PUBLIQUE_MAISON>:41641` : connexion **directe** vers la maison alors qu'aucun port n'est redirigé. C'est le *NAT traversal* (UDP hole punching) de Tailscale.
 
 ### 9.5 ACL Tailscale : moindre privilège
@@ -356,6 +362,9 @@ tailscale set --exit-node=chahd --exit-node-allow-lan-access=true
 
 - `pi-lan` est nécessaire : les services sont joints par `192.168.40.46` via la route de sous-réseau, pas par l'IP 100.x.
 - *Preview rules* confirme que `tag:homelab` ne peut joindre **aucun** port : si le Pi était compromis, il ne pourrait pas rebondir vers mes appareils.
+
+![Preview rules : tag:homelab ne peut joindre aucun port](../images/tailscale/04-acl-preview.png)
+
 - Tests : SSH depuis le laptop ✅, Kuma depuis l'iPhone ✅.
 
 ---
