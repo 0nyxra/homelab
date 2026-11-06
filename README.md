@@ -1,5 +1,7 @@
 # 🌸 homelab
 
+![CI](https://github.com/0nyxra/homelab/actions/workflows/ci.yml/badge.svg)
+
 > **En bref**
 > - **Quoi** : un lab perso sur Raspberry Pi 5, avec une dizaine de services auto-hébergés en Docker (DNS, VPN, reverse proxy HTTPS, supervision).
 > - **Sécurité** : aucun port ouvert sur Internet, accès à distance par Tailscale avec des ACL au moindre privilège, Pi durci (SSH par clé, UFW, Fail2ban, Lynis 67).
